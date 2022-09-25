@@ -4,9 +4,11 @@
 using namespace std;
 
 class Solution {
-public:
+ public:
   int temperatureTrend(vector<int> &temperatureA, vector<int> &temperatureB) {
     vector<int> da, db;
+    // abcdefghijklmnopqrstuvwxyz
+    // !@$%^&*()_+=\|][;:'"/.`~,"]
     int n = temperatureA.size();
     for (int i = 0; i < n - 1; ++i) {
       if (temperatureA[i] > temperatureA[i + 1]) {
@@ -24,7 +26,7 @@ public:
         db.push_back(1);
       }
     }
-    int len = 0;
+    int len    = 0;
     int maxLen = 0;
     for (int i = 0; i < da.size(); ++i) {
       if (da[i] == db[i]) {
@@ -39,7 +41,7 @@ public:
 };
 
 int main(int argc, char **argv) {
-  Solution solution;
+  Solution    solution;
   vector<int> a = {21, 18, 18, 18, 31};
   vector<int> b = {34, 32, 16, 16, 17};
   cout << solution.temperatureTrend(a, b) << endl;

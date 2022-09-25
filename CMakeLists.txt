@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 
 project(Trivial)
 
-set(CPP_DIR ${PROJECT_SOURCE_DIR}/source)
+if(WIN32)
+  set(PLATFROM_WINDOWS)
+	message(STATUS "Now is windows")
+elseif(APPLE)
+	message(STATUS "Now is Apple systens.")
+elseif(UNIX)
+  set(PLATFROM_UNIX)
+	message(STATUS "Now is UNIX-like OS's.")
+endif()
 
-add_subdirectory(${CPP_DIR})
+add_subdirectory(trivial)
