@@ -6,5 +6,3 @@ foreach(SOURCE_FILE IN ITEMS ${CPP_SOURCES})
   STRING(REGEX REPLACE ".+/(.+)\\..*" "\\1" OUTPUT_NAME ${SOURCE_FILE})
   add_executable(${OUTPUT_NAME} ${SOURCE_FILE})
 endforeach()
-
-add_subdirectory(leetcode)
