@@ -11,8 +11,6 @@ class Trie {
 
   void insert(const string& word) {
     Node* cursor = _head;
-    int   i;
-    scanf("%d", i);
     for (const auto& ch : word) {
       Node* child = cursor->childs[ch - 'a'];
       if (child == nullptr) {
