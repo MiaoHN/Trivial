@@ -6,7 +6,7 @@
 using namespace std;
 
 class Solution {
-public:
+ public:
   int transportationHub(vector<vector<int>> &path) {
     unordered_map<int, set<int>> outGraph;
     unordered_map<int, set<int>> inGraph;
@@ -40,7 +40,7 @@ public:
 
 int main(int argc, char **argv) {
   //
-  Solution solution;
+  Solution            solution;
   vector<vector<int>> path = {{0, 3}, {1, 0}, {1, 3}, {2, 0}, {3, 0}, {3, 2}};
   cout << solution.transportationHub(path) << endl;
   return 0;

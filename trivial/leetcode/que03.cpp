@@ -7,61 +7,58 @@
 using namespace std;
 
 class Solution {
-public:
+ public:
   enum Direction { Up, Right, Down, Left };
 
   bool test(int row, int rows, int col, int cols, Direction direction,
             int depth, vector<string> &plate) {
-    if (row < 0 || col < 0 || row >= rows || col >= cols)
-      return false;
-    if (plate[row][col] == 'O')
-      return true;
-    if (depth == 0)
-      return false;
+    if (row < 0 || col < 0 || row >= rows || col >= cols) return false;
+    if (plate[row][col] == 'O') return true;
+    if (depth == 0) return false;
     if (plate[row][col] == '.') {
       switch (direction) {
-      case Up:
-        return test(row - 1, rows, col, cols, direction, depth - 1, plate);
-      case Down:
-        return test(row + 1, rows, col, cols, direction, depth - 1, plate);
-      case Left:
-        return test(row, rows, col - 1, cols, direction, depth - 1, plate);
-      case Right:
-        return test(row, rows, col + 1, cols, direction, depth - 1, plate);
+        case Up:
+          return test(row - 1, rows, col, cols, direction, depth - 1, plate);
+        case Down:
+          return test(row + 1, rows, col, cols, direction, depth - 1, plate);
+        case Left:
+          return test(row, rows, col - 1, cols, direction, depth - 1, plate);
+        case Right:
+          return test(row, rows, col + 1, cols, direction, depth - 1, plate);
       }
     }
     if (plate[row][col] == 'E') {
       // 顺时针
       switch (direction) {
-      case Up:
-        return test(row, rows, col + 1, cols, Right, depth - 1, plate);
-      case Down:
-        return test(row, rows, col - 1, cols, Left, depth - 1, plate);
-      case Left:
-        return test(row - 1, rows, col, cols, Up, depth - 1, plate);
-      case Right:
-        return test(row + 1, rows, col, cols, Down, depth - 1, plate);
+        case Up:
+          return test(row, rows, col + 1, cols, Right, depth - 1, plate);
+        case Down:
+          return test(row, rows, col - 1, cols, Left, depth - 1, plate);
+        case Left:
+          return test(row - 1, rows, col, cols, Up, depth - 1, plate);
+        case Right:
+          return test(row + 1, rows, col, cols, Down, depth - 1, plate);
       }
     }
     if (plate[row][col] == 'W') {
       // 逆时针
       switch (direction) {
-      case Up:
-        return test(row, rows, col - 1, cols, Left, depth - 1, plate);
-      case Down:
-        return test(row, rows, col + 1, cols, Right, depth - 1, plate);
-      case Left:
-        return test(row + 1, rows, col, cols, Down, depth - 1, plate);
-      case Right:
-        return test(row - 1, rows, col, cols, Up, depth - 1, plate);
+        case Up:
+          return test(row, rows, col - 1, cols, Left, depth - 1, plate);
+        case Down:
+          return test(row, rows, col + 1, cols, Right, depth - 1, plate);
+        case Left:
+          return test(row + 1, rows, col, cols, Down, depth - 1, plate);
+        case Right:
+          return test(row - 1, rows, col, cols, Up, depth - 1, plate);
       }
     }
     return false;
   }
 
   vector<vector<int>> ballGame(int num, vector<string> &plate) {
-    int rows = plate.size();
-    int cols = plate[0].size();
+    int                 rows = plate.size();
+    int                 cols = plate[0].size();
     vector<vector<int>> result;
 
     for (int i = 1; i < cols - 1; ++i) {
