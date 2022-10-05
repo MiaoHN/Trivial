@@ -12,4 +12,6 @@ elseif(UNIX)
 	message(STATUS "Now is UNIX-like OS's.")
 endif()
 
+set(OUTPUT_BASE ${PROJECT_SOURCE_DIR}/bin)
+
 add_subdirectory(trivial)
