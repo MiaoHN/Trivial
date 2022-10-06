@@ -31,14 +31,14 @@ std::string valueStr = R"(
 }
 )";
 
-TEST(Node, Basic) {
-  json::Node        json;
-  json::Node::Value value;
+TEST(Json, Basic) {
+  json::Json        json;
+  json::Json::Value value;
   value.setNumber(111);
   json.addNode("num", value);
   value.setString("Hello World");
   json.addNode("str", value);
-  json::Node json2;
+  json::Json json2;
   value.setBool(false);
   json2.addNode("bool", value);
   value.setJson(json2);
@@ -49,7 +49,7 @@ TEST(Node, Basic) {
 }
 
 TEST(Json, Morden) {
-  json::Node json;
+  json::Json json;
   json["number"] = 2;
   json["string"] = "string";
   json["temp"]   = 4;
@@ -63,7 +63,7 @@ TEST(Json, Morden) {
 }
 
 TEST(Parse, Number) {
-  json::Node json = json::parse(numberStr);
+  json::Json json = json::parse(numberStr);
   EXPECT_EQ(json["num1"].getNumber(), 0);
   EXPECT_EQ(json["num2"].getNumber(), 1);
   EXPECT_EQ(json["num3"].getNumber(), 1.3e3);
@@ -72,7 +72,7 @@ TEST(Parse, Number) {
 }
 
 TEST(Parse, ValueType) {
-  json::Node json = json::parse(valueStr);
+  json::Json json = json::parse(valueStr);
   EXPECT_EQ(json["string"].getType(), json::Type::String);
   EXPECT_EQ(json["number"].getType(), json::Type::Number);
   EXPECT_EQ(json["null"].getType(), json::Type::Null);
@@ -86,7 +86,7 @@ TEST(Parse, ValueType) {
 }
 
 TEST(Parse, List) {
-  json::Node json = json::parse(listStr);
+  json::Json json = json::parse(listStr);
   auto       vec  = json["list"].getList();
   EXPECT_EQ(vec[0].getNumber(), 1);
   EXPECT_STREQ(vec[1].getString().c_str(), "item1");

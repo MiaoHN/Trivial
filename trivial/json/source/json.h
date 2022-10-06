@@ -22,7 +22,7 @@ enum class Type {
   Null,
 };
 
-class Node {
+class Json {
  public:
   class Value {
    public:
@@ -55,12 +55,12 @@ class Node {
     }
     void setNull() { setType(Type::Null); }
 
-    void setJson(Node& json) {
-      auto p = std::make_shared<Node>(json);
+    void setJson(Json& json) {
+      auto p = std::make_shared<Json>(json);
       setJson(p);
     }
 
-    void setJson(std::shared_ptr<Node> json) {
+    void setJson(std::shared_ptr<Json> json) {
       setType(Type::Object);
       _json_node = json;
     }
@@ -81,7 +81,7 @@ class Node {
       assert(getType() == Type::List);
       return _list;
     }
-    std::shared_ptr<Node> getJson() {
+    std::shared_ptr<Json> getJson() {
       assert(getType() == Type::Object);
       return _json_node;
     }
@@ -138,11 +138,11 @@ class Node {
     bool                  _bool;
     std::string           _string;
     std::vector<Value>    _list;
-    std::shared_ptr<Node> _json_node;
+    std::shared_ptr<Json> _json_node;
   };
 
-  Node() {}
-  ~Node() {}
+  Json() {}
+  ~Json() {}
 
   void addNode(const std::string& key, const Value& value) {
     _map[key] = value;
@@ -189,7 +189,7 @@ class Parser {
  public:
   Parser(const std::string& source) : _source(source) {}
 
-  Node parse() { return parseObject(); }
+  Json parse() { return parseObject(); }
 
  private:
   void skipWhitespace() {
@@ -294,16 +294,16 @@ class Parser {
     return result * flag;
   }
 
-  Node parseObject() {
+  Json parseObject() {
     // object 内为 key: value 形式的键值对
     // { key1: value1, key2: value2, ... }
     skipWhitespace();
-    Node json;
+    Json json;
     assert(_source[_curr++] == '{');
     while (true) {
       std::string key = parseKey();
       assert(_source[_curr++] == ':');
-      Node::Value value = parseValue();
+      Json::Value value = parseValue();
       json.addNode(key, value);
       if (_source[_curr] != ',') {
         break;
@@ -316,13 +316,13 @@ class Parser {
     return json;
   }
 
-  Node::Value parseList() {
-    Node::Value value;
+  Json::Value parseList() {
+    Json::Value value;
     assert(_source[_curr] == '[');
     ++_curr;
-    std::vector<Node::Value> vec;
+    std::vector<Json::Value> vec;
     while (_curr < _source.size()) {
-      Node::Value val = parseValue();
+      Json::Value val = parseValue();
       vec.push_back(val);
       if (_source[_curr] != ',') {
         if (_source[_curr] == ']') {
@@ -341,9 +341,9 @@ class Parser {
     return value;
   }
 
-  Node::Value parseValue() {
+  Json::Value parseValue() {
     skipWhitespace();
-    Node::Value value;
+    Json::Value value;
     switch (_source[_curr]) {
       case '"': {
         value.setString(parseString());
@@ -360,7 +360,7 @@ class Parser {
         break;
       }
       case '{': {
-        value.setJson(std::make_shared<Node>(parseObject()));
+        value.setJson(std::make_shared<Json>(parseObject()));
         break;
       }
       case '[': {
@@ -421,7 +421,7 @@ class Parser {
 
 }  // namespace detail
 
-inline Node parse(const std::string& str) {
+inline Json parse(const std::string& str) {
   detail::Parser parser(str);
   return parser.parse();
 }
