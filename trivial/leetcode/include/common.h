@@ -21,12 +21,12 @@
 using namespace std;
 
 template <typename T>
-void print(T& v) {
+void print(T&& v) {
   cout << "(not implemented)" << endl;
 }
 
 template <>
-void print(vector<int>& v) {
+void print(vector<int>&& v) {
   if (v.empty()) {
     cout << "(empty)" << endl;
     return;
@@ -36,6 +36,11 @@ void print(vector<int>& v) {
     cout << ", " << v[i];
   }
   cout << "]" << endl;
+}
+
+template <>
+void print(int&& v) {
+  cout << v << endl;
 }
 
 #endif  // __COMMON_H__
