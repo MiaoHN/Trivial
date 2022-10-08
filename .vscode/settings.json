@@ -81,6 +81,15 @@
     "cinttypes": "cpp",
     "typeinfo": "cpp",
     "regex": "cpp",
-    "valarray": "cpp"
+    "valarray": "cpp",
+    "stack": "cpp",
+    "cassert": "cpp",
+    "cerrno": "cpp",
+    "cfloat": "cpp",
+    "climits": "cpp",
+    "unordered_set": "cpp",
+    "ios": "cpp",
+    "queue": "cpp",
+    "cstdbool": "cpp"
   }
 }

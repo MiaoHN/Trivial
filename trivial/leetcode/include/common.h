@@ -21,12 +21,34 @@
 using namespace std;
 
 template <typename T>
-void print(T&& v) {
-  cout << "(not implemented)" << endl;
+void print(const T& v) {
+  cout << "(print not implemented)" << endl;
+}
+
+template <typename T>
+T load(const string& values) {
+  cout << "(load not implemented)" << endl;
 }
 
 template <>
-void print(vector<int>&& v) {
+vector<int> load(const string& values) {
+  vector<int> result;
+  int         cursor = 0;
+  while (true) {
+    while (cursor < values.size() && !isdigit(values[cursor])) ++cursor;
+    if (cursor == values.size()) break;
+    int num = 0;
+    while (cursor < values.size() && isdigit(values[cursor])) {
+      num *= 10;
+      num += values[cursor++] - '0';
+    }
+    result.push_back(num);
+  }
+  return result;
+}
+
+template <>
+void print(const vector<int>& v) {
   if (v.empty()) {
     cout << "(empty)" << endl;
     return;
@@ -39,7 +61,7 @@ void print(vector<int>&& v) {
 }
 
 template <>
-void print(int&& v) {
+void print(const int& v) {
   cout << v << endl;
 }
 
