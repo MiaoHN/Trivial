@@ -25,6 +25,11 @@ void print(const T& v) {
   cout << "(print not implemented)" << endl;
 }
 
+template <>
+void print(const bool& v) {
+  cout << (v ? "true" : "false") << endl;
+}
+
 template <typename T>
 T load(const string& values) {
   cout << "(load not implemented)" << endl;
@@ -62,6 +67,11 @@ void print(const vector<int>& v) {
 
 template <>
 void print(const int& v) {
+  cout << v << endl;
+}
+
+template <>
+void print(const string& v) {
   cout << v << endl;
 }
 
