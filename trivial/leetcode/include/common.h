@@ -38,7 +38,7 @@ T load(const string& values) {
 template <>
 vector<int> load(const string& values) {
   vector<int> result;
-  int         cursor = 0;
+  int cursor = 0;
   while (true) {
     while (cursor < values.size() && !isdigit(values[cursor])) ++cursor;
     if (cursor == values.size()) break;
@@ -61,6 +61,37 @@ void print(const vector<int>& v) {
   cout << "[" << v[0];
   for (int i = 1; i < v.size(); ++i) {
     cout << ", " << v[i];
+  }
+  cout << "]" << endl;
+}
+
+template <>
+void print(const vector<vector<int>>& v) {
+  if (v.empty()) {
+    cout << "(empty)" << endl;
+    return;
+  }
+  cout << "[";
+  if (v[0].empty()) {
+    cout << "(empty)";
+  } else {
+    cout << "[" << v[0][0];
+    for (int i = 1; i < v[0].size(); ++i) {
+      cout << ", " << v[0][i];
+    }
+    cout << "]";
+  }
+  for (int i = 1; i < v.size(); ++i) {
+    cout << ", ";
+    if (v[i].empty()) {
+      cout << "(empty)";
+    } else {
+      cout << "[" << v[i][0];
+      for (int j = 1; j < v[i].size(); ++j) {
+        cout << ", " << v[i][j];
+      }
+      cout << "]";
+    }
   }
   cout << "]" << endl;
 }
