@@ -1,4 +1,11 @@
 .cache/
+.vscode/
+.idea/
+.ccls
+cmake-build-*/
+.vs/
+out/
 build/
 bin/
 lib/
+*.log
