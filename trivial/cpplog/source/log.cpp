@@ -13,7 +13,7 @@ FileAppender::FileAppender(const std::string& name) : m_reopen_duration(1000) {
   time_t t = time(0);
   localtime_r(&t, &tm);
   char buf[64];
-  strftime(buf, sizeof(buf), "%Y-%m-%d-%H:%M:%S", &tm);
+  strftime(buf, sizeof(buf), "%Y_%m_%d_%H_%M_%S", &tm);
   filename += "." + std::string(buf, strlen(buf));
   filename += ".log";
   m_last_open = std::chrono::high_resolution_clock::now();
@@ -40,95 +40,40 @@ void FileAppender::reopen() {
   f.open(filename, std::ios::app);
 }
 
-LogQueue::LogQueue(int max_size) : m_max_size(max_size), m_cursor(0) {
-  m_queue.resize(m_max_size);
-}
-
-void LogQueue::append(const std::string& msg) {
-  std::lock_guard<std::mutex> locker(m_mutex);
-  if (m_cursor == m_max_size) {
-    std::cout << "LogQueue::append(): queue overflow!!!" << std::endl;
-    return;
-  }
-  m_queue[m_cursor++] = msg;
-}
-
-void LogQueue::clear() {
-  std::lock_guard<std::mutex> locker(m_mutex);
-  m_cursor = 0;
-}
-
-int LogQueue::size() {
-  std::lock_guard<std::mutex> locker(m_mutex);
-  return m_cursor;
-}
-
-bool LogQueue::empty() {
-  std::lock_guard<std::mutex> locker(m_mutex);
-  return m_cursor == 0;
-}
-
-bool LogQueue::full() {
-  std::lock_guard<std::mutex> locker(m_mutex);
-  return m_cursor == m_max_size;
-}
-
 LogBackend::LogBackend() : m_running(true) {
   m_worker = new std::thread(std::bind(&LogBackend::output, this));
   m_appenders.push_back(std::make_shared<StdoutAppender>());
   m_appenders.push_back(std::make_shared<FileAppender>("test"));
-  m_input_queue = new LogQueue();
-  m_output_queue = new LogQueue();
 }
 
 LogBackend::~LogBackend() {
   m_running = false;
-  if (!m_input_queue->empty()) {
-    std::vector<std::string>& logs = m_input_queue->m_queue;
-    int size = m_input_queue->size();
-    for (int i = 0; i < size; ++i) {
-      for (auto& appender : m_appenders) {
-        appender->output(logs[i]);
-      }
-    }
+  while (!m_queue.empty()) {
   }
-  delete m_input_queue;
-  delete m_output_queue;
+  while (!m_all_down) {
+  }
   m_worker->join();
   delete m_worker;
 }
 
 void LogBackend::append(const std::string& msg) {
-  std::lock_guard<std::mutex> locker1(m_input_mutex);
-  if (m_input_queue->full()) {
-    while (!m_output_queue->empty()) {
-    }
-
-    std::lock_guard<std::mutex> locker2(m_output_mutex);
-    LogQueue* temp_ptr = m_input_queue;
-    m_input_queue = m_output_queue;
-    m_output_queue = temp_ptr;
+  while (!m_queue.enqueue(msg)) {
   }
-  m_input_queue->append(msg);
 }
 
 void LogBackend::output(void* ptr) {
   LogBackend* backend = (LogBackend*)ptr;
-  std::mutex& mutex = backend->m_output_mutex;
-  while (backend->m_running) {
-    if (backend->m_output_queue == nullptr) continue;
-    if (!backend->m_output_queue->empty()) {
-      std::lock_guard<std::mutex> locker(mutex);
-      std::vector<std::string>& logs = backend->m_output_queue->m_queue;
-      int size = backend->m_output_queue->size();
-      for (int i = 0; i < size; ++i) {
+  std::string msg;
+  while (backend->m_running || !backend->m_queue.empty()) {
+    while (!backend->m_queue.empty()) {
+      if (backend->m_queue.dequeue(msg)) {
         for (auto& appender : backend->m_appenders) {
-          appender->output(logs[i]);
+          appender->output(msg);
         }
       }
-      backend->m_output_queue->clear();
     }
   }
+  backend->m_all_down = true;
 }
 
 LogEvent::LogEvent(const char* filename, LogLevel level, uint64_t time,

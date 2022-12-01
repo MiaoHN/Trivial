@@ -16,6 +16,8 @@
 #include <string>
 #include <thread>
 
+#include "lock_free_queue.h"
+
 class LogAppender {
  public:
   virtual void output(const std::string& msg) = 0;
@@ -49,34 +51,6 @@ class FileAppender : public LogAppender {
 };
 
 /**
- * @brief Sync log queue with mutex, default log size is 1024
- *
- */
-class LogQueue {
-  friend class LogBackend;
-
- public:
-  LogQueue(int max_size = 1024);
-
-  void append(const std::string& msg);
-
-  void clear();
-
-  int size();
-
-  bool empty();
-
-  bool full();
-
- private:
-  std::mutex m_mutex;
-  int m_max_size;
-  int m_cursor;
-
-  std::vector<std::string> m_queue;
-};
-
-/**
  * @brief Log backend, output logs to appenders
  *
  */
@@ -97,12 +71,10 @@ class LogBackend {
 
   std::thread* m_worker;
 
-  LogQueue* m_input_queue;
-  LogQueue* m_output_queue;
+  LockFreeQueue<std::string, 1024> m_queue;
 
-  std::mutex m_input_mutex;
-  std::mutex m_output_mutex;
   bool m_running;
+  bool m_all_down;
 
   std::vector<std::shared_ptr<LogAppender>> m_appenders;
 };
@@ -183,7 +155,7 @@ class Logger {
 #define LOG_INFO() LOG_LEVEL(LogLevel::Info)
 #define LOG_DEBUG() LOG_LEVEL(LogLevel::Debug)
 #define LOG_WARN() LOG_LEVEL(LogLevel::Warn)
-#define LOG_ERROR() LOG_LEVEL(LogLevel::error)
-#define LOG_FATAL() LOG_LEVEL(LogLevel::fatal)
+#define LOG_ERROR() LOG_LEVEL(LogLevel::Error)
+#define LOG_FATAL() LOG_LEVEL(LogLevel::Fatal)
 
 #endif  // __LOG_H__
