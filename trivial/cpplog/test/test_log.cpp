@@ -2,7 +2,7 @@
 
 #include "log.h"
 
-int times = 10000;
+int times = 100;
 
 void Foo() {
   for (int i = 0; i < times; ++i) LOG_INFO() << "This is Foo():" << i;
