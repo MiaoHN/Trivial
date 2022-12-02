@@ -5,12 +5,10 @@ project(Trivial)
 enable_testing()
 
 if(WIN32)
-	set(PLATFROM_WINDOWS)
 	message(STATUS "Now is windows")
 elseif(APPLE)
 	message(STATUS "Now is Apple systens.")
 elseif(UNIX)
-	set(PLATFROM_UNIX)
 	message(STATUS "Now is UNIX-like OS's.")
 endif()
 

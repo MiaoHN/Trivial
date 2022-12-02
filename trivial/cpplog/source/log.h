@@ -1,8 +1,12 @@
 #ifndef __LOG_H__
 #define __LOG_H__
 
-#include <string.h>
+#include <cstring>
+#if WIN32
+#include <windows.h>
+#else
 #include <sys/syscall.h>
+#endif
 #include <unistd.h>
 
 #include <chrono>
@@ -33,9 +37,10 @@ class FileAppender : public LogAppender {
   /**
    * @brief Output log to file
    *
-   * @param name file name will be `name-<time>.log`
+   * @param name file name will be `name.<time>.log`
+   * @param reopen_duration ms (default 2000ms)
    */
-  FileAppender(const std::string& name);
+  explicit FileAppender(const std::string& name, int reopen_duration = 2000);
   ~FileAppender();
 
   void output(const std::string& msg) override;
@@ -47,7 +52,7 @@ class FileAppender : public LogAppender {
   std::ofstream f;
   std::string filename;
   int m_reopen_duration;  // ms
-  std::chrono::time_point<std::chrono::high_resolution_clock> m_last_open;
+  std::chrono::steady_clock::time_point m_last_open;
 };
 
 /**
@@ -114,11 +119,11 @@ class LogEvent {
  */
 class LogEventWrapper {
  public:
-  LogEventWrapper(std::shared_ptr<LogEvent> event);
+  explicit LogEventWrapper(std::shared_ptr<LogEvent> event);
 
   ~LogEventWrapper();
 
-  std::shared_ptr<LogEvent> getEvent() const;
+  [[nodiscard]] std::shared_ptr<LogEvent> getEvent() const;
 
   std::stringstream& getSs();
 
@@ -128,7 +133,7 @@ class LogEventWrapper {
 
 class Logger {
  public:
-  void log(std::shared_ptr<LogEvent> event);
+  void log(const std::shared_ptr<LogEvent>& event);
 
  private:
   /**
@@ -141,15 +146,22 @@ class Logger {
    * @param event
    * @return std::string
    */
-  std::string formatEvent(std::shared_ptr<LogEvent> event);
+  static std::string formatEvent(const std::shared_ptr<LogEvent>& event);
 
   std::mutex m_mutex;
 };
 
+#if WIN32
+#define LOG_LEVEL(level)                                                      \
+  LogEventWrapper(std::make_shared<LogEvent>(__FILE__, level, time(0),        \
+                                             __LINE__, GetCurrentThreadId())) \
+      .getSs()
+#else
 #define LOG_LEVEL(level)                                                     \
   LogEventWrapper(std::make_shared<LogEvent>(__FILE__, level, time(0),       \
                                              __LINE__, syscall(SYS_gettid))) \
       .getSs()
+#endif
 
 #define LOG_TRACE() LOG_LEVEL(LogLevel::Trace)
 #define LOG_INFO() LOG_LEVEL(LogLevel::Info)

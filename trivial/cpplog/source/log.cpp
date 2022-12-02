@@ -1,22 +1,23 @@
 #include "log.h"
 
+#include <utility>
+
 LogBackend g_log_backend;
 
 void StdoutAppender::output(const std::string& msg) {
   std::cout << msg << std::endl;
 }
 
-FileAppender::FileAppender(const std::string& name) : m_reopen_duration(1000) {
+FileAppender::FileAppender(const std::string& name, int reopen_duration)
+    : m_reopen_duration(reopen_duration) {
   filename = name;
   // TODO print something to inform true format of file-log names
-  struct tm tm;
-  time_t t = time(0);
-  localtime_r(&t, &tm);
+  time_t t = time(nullptr);
   char buf[64];
-  strftime(buf, sizeof(buf), "%Y_%m_%d_%H_%M_%S", &tm);
+  strftime(buf, sizeof(buf), "%Y_%m_%d_%H_%M_%S", localtime(&t));
   filename += "." + std::string(buf, strlen(buf));
   filename += ".log";
-  m_last_open = std::chrono::high_resolution_clock::now();
+  m_last_open = std::chrono::steady_clock::now();
 
   f.open(filename, std::ios::app);
 }
@@ -24,10 +25,9 @@ FileAppender::FileAppender(const std::string& name) : m_reopen_duration(1000) {
 FileAppender::~FileAppender() { f.close(); }
 
 void FileAppender::output(const std::string& msg) {
-  std::chrono::time_point<std::chrono::high_resolution_clock> now =
-      std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double, std::milli> duration = now - m_last_open;
-  if (duration.count() >= m_reopen_duration) {
+  std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+  std::chrono::steady_clock::duration duration = now - m_last_open;
+  if (static_cast<int>((double)duration.count() / 1e6) >= m_reopen_duration) {
     reopen();
     m_last_open = now;
   }
@@ -40,9 +40,9 @@ void FileAppender::reopen() {
   f.open(filename, std::ios::app);
 }
 
-LogBackend::LogBackend() : m_running(true) {
-  m_worker = new std::thread(std::bind(&LogBackend::output, this));
-  m_appenders.push_back(std::make_shared<StdoutAppender>());
+LogBackend::LogBackend() : m_running(true), m_all_down(false) {
+  m_worker = new std::thread([this] { return LogBackend::output(this); });
+  // m_appenders.push_back(std::make_shared<StdoutAppender>());
   m_appenders.push_back(std::make_shared<FileAppender>("test"));
 }
 
@@ -62,7 +62,7 @@ void LogBackend::append(const std::string& msg) {
 }
 
 void LogBackend::output(void* ptr) {
-  LogBackend* backend = (LogBackend*)ptr;
+  auto* backend = (LogBackend*)ptr;
   std::string msg;
   while (backend->m_running || !backend->m_queue.empty()) {
     while (!backend->m_queue.empty()) {
@@ -91,7 +91,7 @@ LogLevel LogEvent::getLevel() const { return m_level; }
 pid_t LogEvent::getPid() const { return m_pid; }
 
 LogEventWrapper::LogEventWrapper(std::shared_ptr<LogEvent> event)
-    : m_event(event) {}
+    : m_event(std::move(event)) {}
 
 static thread_local Logger s_logger;
 
@@ -103,7 +103,7 @@ std::shared_ptr<LogEvent> LogEventWrapper::getEvent() const { return m_event; }
 
 std::stringstream& LogEventWrapper::getSs() { return m_event->getSs(); }
 
-void Logger::log(std::shared_ptr<LogEvent> event) {
+void Logger::log(const std::shared_ptr<LogEvent>& event) {
   std::lock_guard<std::mutex> locker(m_mutex);
   g_log_backend.append(formatEvent(event));
 }
@@ -127,13 +127,11 @@ static std::string ToString(LogLevel level) {
   }
 }
 
-std::string Logger::formatEvent(std::shared_ptr<LogEvent> event) {
+std::string Logger::formatEvent(const std::shared_ptr<LogEvent>& event) {
   std::string msg = event->getSs().str();
-  struct tm tm;
-  time_t t = time(0);
-  localtime_r(&t, &tm);
+  time_t t = time(nullptr);
   char buf[64];
-  strftime(buf, sizeof(buf), "%H:%M:%S", &tm);
+  strftime(buf, sizeof(buf), "%H:%M:%S", localtime(&t));
   std::string pid_str = "[" + std::to_string(event->getPid()) + "] ";
   std::string time_str = "[" + std::string(buf, strlen(buf)) + "] ";
   return time_str + pid_str + ToString(event->getLevel()) + msg;
