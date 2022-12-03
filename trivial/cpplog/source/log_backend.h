@@ -31,12 +31,8 @@ class LogBackend {
   static void output(void* ptr);
 
   std::thread* m_worker;
-  std::mutex m_append_mutex;
 
-  std::string m_messages;
-  int m_buffersize;
-
-  LockFreeQueue<std::string, 16> m_queue;
+  LockFreeQueue<std::string, 256> m_queue;
 
   bool m_running;
   bool m_all_down;
