@@ -7,7 +7,7 @@
 
 void test_log() {
   Timer timer;
-  int lines = 1000000;
+  int lines = 1000;
   for (int i = 0; i < lines; ++i) {
     LOG_INFO() << "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   }

@@ -13,7 +13,6 @@ namespace cpplog {
  * @brief 日志前端
  * @details 通过使用 log() 函数向 buffer 中添加日志，一旦 buffer 被填满，就将
  * buffer 送到日志后端的无锁队列中
- * @attention 该类通过thread_local 保证每个线程只有一个实例，无需添加锁
  *
  */
 class Logger {
