@@ -44,8 +44,6 @@ int eight_digits(char *start, char *end) {
   int head = 0;
   int tail = 0;
 
-  int visited[MAXN] = {0};
-
   int step[MAXN] = {0};
 
   int direction[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
@@ -53,7 +51,6 @@ int eight_digits(char *start, char *end) {
   strcpy(queue[tail], start);
 
   tail++;
-  visited[head] = 1;
 
   while (head < tail) {
     if (depth > max_depth) {
@@ -100,7 +97,6 @@ int eight_digits(char *start, char *end) {
         if (!found) {
           strcpy(queue[tail], new_state);
           tail++;
-          visited[tail] = 1;
           step[tail] = step[head] + 1;
         }
       }
