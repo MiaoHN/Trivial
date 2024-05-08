@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAXN 10000
+#define MAXN 100000
 
 /**
  * @brief 解决八数码问题
@@ -37,9 +37,10 @@ int main(int argc, char const *argv[]) {
 }
 
 int eight_digits(char *start, char *end) {
-  int max_depth = 100;
+  int max_depth = 500;
   int depth = 0;
   char queue[MAXN][10];
+  int parent[MAXN] = { -1 };
 
   int head = 0;
   int tail = 0;
@@ -96,6 +97,7 @@ int eight_digits(char *start, char *end) {
 
         if (!found) {
           strcpy(queue[tail], new_state);
+          parent[tail] = head;
           tail++;
           step[tail] = step[head] + 1;
         }
