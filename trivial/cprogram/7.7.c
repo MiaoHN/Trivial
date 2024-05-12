@@ -1,5 +1,7 @@
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct student {
 char stuID[10];
@@ -13,16 +15,19 @@ int main()
 {
 	int n;//输入操作次数 
 	int i,j,k=0;
-	char order;
+	char order[2];
+	char m[2]={'i'};
+	char t[2]={'s'};
 	struct student stu[100];
 	scanf("%d",&n);
 	while(n--){
-		scanf("%c",&order);
-			if(order=='i'){
-				scanf("%s%c%d%s",stu[k].name,stu[k].sex,&stu[k].age,stu[k].stuID);
+		scanf("%s",order);
+			if(order[0] == 'i'){
+				scanf("%s %c %d %s",stu[k].name,&stu[k].sex,&stu[k].age,stu[k].stuID);
 				k++;
+				continue;
 			}
-			else if(order=='s'){
+			else if(order[0] == 's'){
 				if(k==0){
 					printf("null\n");
 				}
