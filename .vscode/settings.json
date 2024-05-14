@@ -90,6 +90,7 @@
     "unordered_set": "cpp",
     "ios": "cpp",
     "queue": "cpp",
-    "cstdbool": "cpp"
+    "cstdbool": "cpp",
+    "stdio.h": "c"
   }
 }

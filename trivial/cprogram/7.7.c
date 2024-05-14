@@ -1,42 +1,48 @@
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-struct student {
-char stuID[10];
-char name[20];
-char sex;
-int age;
-};
-
-
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+typedef struct
+{
+	char stuID[10];
+	char name[20];
+	char sex;
+	int age;
+}student;
 int main()
 {
-	int n;//输入操作次数 
-	int i,j,k=0;
-	char order[2];
-	char m[2]={'i'};
-	char t[2]={'s'};
-	struct student stu[100];
-	scanf("%d",&n);
-	while(n--){
-		scanf("%s",order);
-			if(order[0] == 'i'){
-				scanf("%s %c %d %s",stu[k].name,&stu[k].sex,&stu[k].age,stu[k].stuID);
-				k++;
-				continue;
+	student students[20];
+	int n, i, j;
+	int sum = 0;
+	scanf("%d\n", &n);
+	for (i = 0; i < n; i++)
+	{
+		char a;
+		scanf(" %c", &a);
+		if (a == 'i')
+		{
+			scanf("%s", students[sum].name);
+			scanf(" %c", &students[sum].sex);
+			scanf(" %d", &students[sum].age);
+			scanf(" %s\n", students[sum].stuID);
+			sum++;
+		}
+		else if (a == 's')
+		{
+			if (sum == 0)
+			{
+				printf("null");
 			}
-			else if(order[0] == 's'){
-				if(k==0){
-					printf("null\n");
-				}
-				else{
-					for(j=0;j<k;j++){
-						printf("%s %s %c %d\n",stu[j].stuID,stu[j].name,stu[j].sex,stu[j].age);
-					}
+			else
+			{
+				for (j = 0; j < sum; j++)
+				{
+					printf("%s ", students[j].stuID);
+					printf("%s ", students[j].name);
+					printf("%c ", students[j].sex);
+					printf("%d", students[j].age);
+					printf("\n");
 				}
 			}
+		}
 	}
 	return 0;
 }

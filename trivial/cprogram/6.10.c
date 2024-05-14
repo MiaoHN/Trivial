@@ -13,7 +13,7 @@ char *replace(char *s,char *s1,char *s2){
     int replaced=0;
     //printf("这里没问题");
     while(*src){
-        if(strncmp(src,s1,s1len)==0){
+        if(strlen(src) >= s1len && strncmp(src,s1,s1len)==0){
             if(!replaced){
                 replaced=1;
                 size_t newlen=slen+(s2len-s1len)*(src-s);//src-s代表从s（开头）到src的字符数（距离）
