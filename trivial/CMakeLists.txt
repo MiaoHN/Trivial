@@ -5,7 +5,7 @@ add_subdirectory(single)
 add_subdirectory(cprogram)
 
 if(UNIX)
-  add_subdirectory(coroutine)
+  # add_subdirectory(coroutine)
   add_subdirectory(cpplog)
 else()
   message(STATUS "coroutine not loaded")
