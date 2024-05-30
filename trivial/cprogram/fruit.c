@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include<stdio.h>
-typedef struct
+typedef struct fruitinfo
 {
 	int no;
 	char name[20];
